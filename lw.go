@@ -3,9 +3,8 @@ package lw
 import (
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
+	"os"
 	"os/exec"
-	"path"
-	"runtime"
 )
 
 //lw对象
@@ -16,12 +15,9 @@ type LwSoft struct {
 
 //注册乐玩com组件
 func Reg() (unknown *ole.IUnknown, err error) {
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		panic("No caller information")
-	}
 	var com LwSoft
-	ret := exec.Command("regsvr32", "/s", path.Dir(filename)+"\\lw.dll")
+	dir, _ := os.Getwd()
+	ret := exec.Command("regsvr32", "/s", dir+"\\lw.dll")
 	_, err = ret.Output()
 	if err != nil {
 		panic(err)
@@ -34,11 +30,8 @@ func Reg() (unknown *ole.IUnknown, err error) {
 	return com.IUnknown, err
 }
 func UnReg() {
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		panic("No caller information")
-	}
-	cmd := exec.Command("regsvr32", "/s", "/u", path.Dir(filename)+"\\lw.dll")
+	dir, _ := os.Getwd()
+	cmd := exec.Command("regsvr32", "/s", "/u", dir+"\\lw.dll")
 	_, err := cmd.Output()
 	if err != nil {
 		panic("取消注册失败,请注意lw.dll是否存在以及是否是管理员权限运行:" + err.Error())
